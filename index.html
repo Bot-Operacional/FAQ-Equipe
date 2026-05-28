@@ -1,498 +1,406 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Assistente da Equipe</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Assistente da Equipe</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
 
-  :root {
-    --bg: #0f1117;
-    --bg2: #171b27;
-    --bg3: #1e2336;
-    --surface: #232940;
-    --surface2: #2d3452;
-    --accent: #4f8ef7;
-    --accent2: #7ab3ff;
-    --accent-glow: rgba(79,142,247,0.15);
-    --text: #e8ecf7;
-    --text2: #8f9abf;
-    --text3: #5a6280;
-    --border: rgba(255,255,255,0.07);
-    --border2: rgba(79,142,247,0.3);
-    --user-bg: #1a3a6e;
-    --user-border: #2a5ab0;
-    --bot-bg: #1e2336;
-    --bot-border: rgba(255,255,255,0.07);
-    --danger: #e05c6a;
-    --success: #4cc98a;
-    --radius: 16px;
-    --radius-sm: 8px;
-  }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #f2f6ff, #eef2f7);
+      color: #1f2937;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
 
-  html, body { height: 100%; }
+    .page {
+      width: 100%;
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 28px;
+      align-items: stretch;
+    }
 
-  body {
-    font-family: 'Sora', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 1rem;
-  }
+    .hero, .chat-card {
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.10);
+      overflow: hidden;
+    }
 
-  .app {
-    width: 100%;
-    max-width: 740px;
-    height: 90vh;
-    max-height: 820px;
-    display: flex;
-    flex-direction: column;
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    background: var(--bg2);
-    overflow: hidden;
-    position: relative;
-  }
+    .hero {
+      padding: 42px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
 
-  /* header */
-  .header {
-    padding: 1.2rem 1.5rem;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    background: var(--bg3);
-    flex-shrink: 0;
-  }
+    .badge {
+      display: inline-block;
+      background: #e8f0ff;
+      color: #1d4ed8;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 22px;
+    }
 
-  .logo {
-    width: 42px; height: 42px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #2a4fa8, #4f8ef7);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
-    flex-shrink: 0;
-    box-shadow: 0 0 0 1px rgba(79,142,247,0.4);
-  }
+    h1 {
+      font-size: 42px;
+      line-height: 1.1;
+      margin-bottom: 18px;
+      color: #111827;
+    }
 
-  .header-text { flex: 1; }
-  .header-title {
-    font-size: 15px; font-weight: 600; color: var(--text);
-    letter-spacing: -0.02em;
-  }
-  .header-sub {
-    font-size: 12px; color: var(--text2); margin-top: 1px;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .dot-online {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--success);
-    box-shadow: 0 0 6px var(--success);
-  }
+    .subtitle {
+      font-size: 18px;
+      line-height: 1.6;
+      color: #4b5563;
+      max-width: 620px;
+      margin-bottom: 28px;
+    }
 
-  .clear-btn {
-    padding: 6px 12px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text2);
-    font-family: 'Sora', sans-serif;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all .15s;
-  }
-  .clear-btn:hover { border-color: var(--accent); color: var(--accent2); background: var(--accent-glow); }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
 
-  /* messages */
-  .messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-    scroll-behavior: smooth;
-  }
+    .feature {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      padding: 16px;
+      font-size: 15px;
+      color: #374151;
+    }
 
-  .messages::-webkit-scrollbar { width: 4px; }
-  .messages::-webkit-scrollbar-track { background: transparent; }
-  .messages::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 4px; }
+    .feature strong {
+      display: block;
+      color: #111827;
+      margin-bottom: 4px;
+    }
 
-  /* welcome */
-  .welcome {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex: 1;
-    text-align: center;
-    gap: 1rem;
-    padding: 2rem;
-    animation: fadeUp .4s ease;
-  }
-  .welcome-icon {
-    font-size: 48px;
-    filter: drop-shadow(0 0 16px rgba(79,142,247,0.5));
-  }
-  .welcome h2 {
-    font-size: 22px; font-weight: 600; color: var(--text);
-    letter-spacing: -0.03em;
-  }
-  .welcome p { font-size: 14px; color: var(--text2); line-height: 1.7; max-width: 400px; }
+    .note {
+      margin-top: 28px;
+      background: #fff7ed;
+      color: #9a3412;
+      border: 1px solid #fed7aa;
+      border-radius: 16px;
+      padding: 14px 16px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
 
-  .suggestions {
-    display: flex; flex-wrap: wrap; gap: 8px;
-    justify-content: center; margin-top: .5rem;
-  }
-  .suggestion {
-    padding: 7px 14px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text2);
-    font-size: 12.5px;
-    cursor: pointer;
-    transition: all .15s;
-    font-family: 'Sora', sans-serif;
-  }
-  .suggestion:hover {
-    border-color: var(--accent);
-    color: var(--accent2);
-    background: var(--accent-glow);
-  }
+    .chat-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 660px;
+    }
 
-  /* message bubble */
-  .msg { display: flex; gap: 12px; animation: fadeUp .25s ease; }
-  .msg.user { flex-direction: row-reverse; }
+    .chat-header {
+      padding: 22px;
+      background: #1d4ed8;
+      color: white;
+    }
 
-  .avatar {
-    width: 32px; height: 32px; border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 15px; flex-shrink: 0;
-  }
-  .msg.bot .avatar { background: linear-gradient(135deg, #2a4fa8, #4f8ef7); }
-  .msg.user .avatar { background: var(--surface2); font-size: 12px; font-weight: 600; color: var(--accent2); }
+    .chat-header h2 {
+      font-size: 21px;
+      margin-bottom: 4px;
+    }
 
-  .bubble {
-    max-width: 78%;
-    padding: .75rem 1rem;
-    border-radius: 14px;
-    font-size: 14px;
-    line-height: 1.65;
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-  .msg.bot .bubble {
-    background: var(--bot-bg);
-    border: 1px solid var(--bot-border);
-    border-top-left-radius: 4px;
-    color: var(--text);
-  }
-  .msg.user .bubble {
-    background: var(--user-bg);
-    border: 1px solid var(--user-border);
-    border-top-right-radius: 4px;
-    color: #c8deff;
-  }
+    .chat-header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
 
-  /* typing */
-  .typing-dots { display: flex; gap: 5px; align-items: center; height: 20px; }
-  .typing-dots span {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--text3);
-    animation: bounce 1.2s infinite;
-  }
-  .typing-dots span:nth-child(2) { animation-delay: .2s; }
-  .typing-dots span:nth-child(3) { animation-delay: .4s; }
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      font-size: 13px;
+    }
 
-  /* error */
-  .error-msg {
-    font-size: 13px; color: var(--danger);
-    padding: .5rem 1rem; border-radius: var(--radius-sm);
-    background: rgba(224,92,106,0.08);
-    border: 1px solid rgba(224,92,106,0.2);
-    align-self: center;
-    animation: fadeUp .2s ease;
-  }
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #22c55e;
+    }
 
-  /* input */
-  .input-area {
-    padding: 1rem 1.2rem 1.2rem;
-    border-top: 1px solid var(--border);
-    background: var(--bg3);
-    flex-shrink: 0;
-  }
+    .messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background: #f8fafc;
+    }
 
-  .input-wrap {
-    display: flex;
-    align-items: flex-end;
-    gap: 10px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: .7rem 1rem;
-    transition: border-color .15s;
-  }
-  .input-wrap:focus-within { border-color: var(--border2); }
+    .message {
+      max-width: 88%;
+      padding: 12px 14px;
+      border-radius: 18px;
+      margin-bottom: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-line;
+    }
 
-  #msgInput {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--text);
-    font-family: 'Sora', sans-serif;
-    font-size: 14px;
-    resize: none;
-    min-height: 22px;
-    max-height: 140px;
-    line-height: 1.5;
-  }
-  #msgInput::placeholder { color: var(--text3); }
+    .bot {
+      background: #ffffff;
+      color: #1f2937;
+      border-bottom-left-radius: 6px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    }
 
-  .send-btn {
-    width: 34px; height: 34px;
-    border-radius: 10px;
-    border: none;
-    background: var(--accent);
-    color: #fff;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    transition: all .15s;
-    font-size: 16px;
-  }
-  .send-btn:hover { background: var(--accent2); transform: scale(1.05); }
-  .send-btn:active { transform: scale(0.97); }
-  .send-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+    .user {
+      margin-left: auto;
+      background: #1d4ed8;
+      color: #ffffff;
+      border-bottom-right-radius: 6px;
+    }
 
-  .input-hint {
-    text-align: center;
-    font-size: 11px;
-    color: var(--text3);
-    margin-top: .6rem;
-  }
+    .quick-actions {
+      padding: 14px 16px;
+      background: #ffffff;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
 
-  @keyframes bounce {
-    0%, 60%, 100% { transform: translateY(0); }
-    30% { transform: translateY(-6px); }
-  }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-</style>
+    .quick-actions button {
+      border: 1px solid #dbeafe;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border-radius: 999px;
+      padding: 8px 11px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: 0.2s;
+    }
+
+    .quick-actions button:hover {
+      background: #dbeafe;
+    }
+
+    .input-area {
+      padding: 16px;
+      background: #ffffff;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      gap: 10px;
+    }
+
+    .input-area input {
+      flex: 1;
+      border: 1px solid #d1d5db;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .input-area input:focus {
+      border-color: #1d4ed8;
+      box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.14);
+    }
+
+    .input-area button {
+      border: none;
+      background: #1d4ed8;
+      color: white;
+      border-radius: 14px;
+      padding: 0 18px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: 0.2s;
+    }
+
+    .input-area button:hover {
+      background: #1e40af;
+    }
+
+    footer {
+      margin-top: 22px;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    @media (max-width: 900px) {
+      .page {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 34px;
+      }
+
+      .hero {
+        padding: 30px;
+      }
+
+      .features {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
+  <main class="page">
+    <section class="hero">
+      <div>
+        <span class="badge">Canal de apoio da liderança</span>
+        <h1>Assistente da Equipe</h1>
+        <p class="subtitle">
+          Um chatbot simples para esclarecer dúvidas cotidianas dos profissionais da equipe, centralizando orientações sobre processos, acessos, apontamentos, férias, reembolso e comunicação interna.
+        </p>
 
-<div class="app">
-  <div class="header">
-    <div class="logo">🤖</div>
-    <div class="header-text">
-      <div class="header-title">Assistente da Equipe</div>
-      <div class="header-sub">
-        <div class="dot-online"></div>
-        Disponível para ajudar
+        <div class="features">
+          <div class="feature">
+            <strong>Respostas rápidas</strong>
+            Dúvidas frequentes organizadas em um único lugar.
+          </div>
+          <div class="feature">
+            <strong>Uso simples</strong>
+            A equipe pode digitar a pergunta ou clicar nos atalhos.
+          </div>
+          <div class="feature">
+            <strong>Fácil de editar</strong>
+            As respostas ficam no próprio arquivo HTML.
+          </div>
+          <div class="feature">
+            <strong>Pronto para GitHub Pages</strong>
+            Publique como página estática usando o arquivo index.html.
+          </div>
+        </div>
+
+        <div class="note">
+          Importante: personalize os textos conforme os processos oficiais da sua área e substitua contatos, links e políticas internas antes de compartilhar com o time.
+        </div>
       </div>
-    </div>
-    <button class="clear-btn" onclick="clearChat()">Limpar chat</button>
-  </div>
 
-  <div class="messages" id="messages">
-    <div class="welcome" id="welcome">
-      <div class="welcome-icon">✦</div>
-      <h2>Olá! Como posso ajudar?</h2>
-      <p>Sou um assistente de IA para dúvidas do dia a dia. Pergunte sobre processos, comunicação, gestão de tempo, ferramentas de trabalho e muito mais.</p>
-      <div class="suggestions">
-        <button class="suggestion" onclick="sendSuggestion('Tela preta ao tentar acessar a VDI — o que faço?')">Tela preta na VDI</button>
-        <button class="suggestion" onclick="sendSuggestion('Como escrever um e-mail profissional de forma clara?')">Como escrever um e-mail profissional?</button>
-        <button class="suggestion" onclick="sendSuggestion('Dicas para organizar melhor minha rotina de trabalho')">Organizar minha rotina</button>
-        <button class="suggestion" onclick="sendSuggestion('Como dar um feedback construtivo para um colega?')">Feedback construtivo</button>
-        <button class="suggestion" onclick="sendSuggestion('Técnicas para conduzir uma reunião eficiente')">Reuniões mais eficientes</button>
-        <button class="suggestion" onclick="sendSuggestion('Como lidar com conflitos na equipe de forma profissional?')">Resolver conflitos na equipe</button>
-        <button class="suggestion" onclick="sendSuggestion('Explique o método Pomodoro para gestão do tempo')">Método Pomodoro</button>
+      <footer>
+        Desenvolvido para apoiar a comunicação, reduzir dúvidas repetitivas e facilitar o dia a dia da equipe.
+      </footer>
+    </section>
+
+    <section class="chat-card" aria-label="Chatbot da equipe">
+      <div class="chat-header">
+        <h2>Chatbot de Dúvidas</h2>
+        <p>Pergunte sobre rotinas, processos e orientações do time.</p>
+        <div class="status"><span class="dot"></span> Online para consulta</div>
       </div>
-    </div>
-  </div>
 
-  <div class="input-area">
-    <div class="input-wrap">
-      <textarea id="msgInput" placeholder="Digite sua dúvida..." rows="1"
-        onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-      <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
-    </div>
-    <div class="input-hint">Pressione Enter para enviar · Shift+Enter para nova linha</div>
-  </div>
-</div>
+      <div id="messages" class="messages"></div>
 
-<script>
-const SYSTEM_PROMPT = `Você é um assistente virtual de apoio para uma equipe de profissionais. Seu papel é responder dúvidas do cotidiano de trabalho com clareza, objetividade e um tom amigável e respeitoso.
+      <div class="quick-actions">
+        <button onclick="quickAsk('Como solicitar férias?')">Férias</button>
+        <button onclick="quickAsk('Como apontar horas?')">Apontamento</button>
+        <button onclick="quickAsk('Como pedir reembolso?')">Reembolso</button>
+        <button onclick="quickAsk('Como solicitar acesso?')">Acessos</button>
+        <button onclick="quickAsk('Onde encontro documentos?')">Documentos</button>
+        <button onclick="quickAsk('Quem devo procurar?')">Contatos</button>
+      </div>
 
-Suas especialidades incluem:
-- Comunicação profissional (e-mails, reuniões, apresentações)
-- Gestão de tempo e produtividade
-- Relacionamento interpessoal e trabalho em equipe
-- Processos administrativos e organizacionais
-- Ferramentas e tecnologias do ambiente de trabalho
-- Liderança e gestão de pessoas
-- Bem-estar e equilíbrio no trabalho
+      <form class="input-area" onsubmit="sendMessage(event)">
+        <input id="userInput" type="text" placeholder="Digite sua dúvida aqui..." autocomplete="off" />
+        <button type="submit">Enviar</button>
+      </form>
+    </section>
+  </main>
 
-Sempre responda em português brasileiro, de forma clara e prática. Quando pertinente, organize a resposta com tópicos ou passos numerados para facilitar a leitura. Seja conciso mas completo.
+  <script>
+    const messages = document.getElementById('messages');
+    const userInput = document.getElementById('userInput');
 
----
-BASE DE CONHECIMENTO — PROBLEMAS TÉCNICOS CONHECIDOS:
+    const respostas = [
+      {
+        palavras: ['ferias', 'férias', 'descanso', 'ausencia', 'ausência'],
+        resposta: 'Para solicitar férias:\n\n1. Verifique seu saldo disponível.\n2. Alinhe previamente o período com sua liderança.\n3. Registre a solicitação no sistema corporativo de RH.\n4. Aguarde a aprovação formal.\n\nRecomendação: faça a solicitação com antecedência para facilitar o planejamento da equipe.'
+      },
+      {
+        palavras: ['hora', 'horas', 'timesheet', 'apontamento', 'lançamento'],
+        resposta: 'O apontamento de horas deve ser feito conforme a rotina definida para o projeto ou área.\n\nBoas práticas:\n1. Lance as horas diariamente.\n2. Use a atividade/projeto correto.\n3. Revise antes de enviar.\n4. Em caso de erro, acione sua liderança ou o suporte responsável.'
+      },
+      {
+        palavras: ['reembolso', 'despesa', 'nota fiscal', 'recibo'],
+        resposta: 'Para solicitar reembolso:\n\n1. Guarde comprovantes, recibos ou notas fiscais.\n2. Verifique se a despesa está prevista na política interna.\n3. Registre a solicitação no sistema indicado pela empresa.\n4. Envie para aprovação dentro do prazo.\n\nEm caso de dúvida, confirme com sua liderança antes de realizar a despesa.'
+      },
+      {
+        palavras: ['acesso', 'senha', 'vpn', 'sistema', 'login', 'permissão', 'permissao'],
+        resposta: 'Para dúvidas de acesso:\n\n1. Confirme se seu login e senha estão ativos.\n2. Verifique a conexão de internet/VPN, quando aplicável.\n3. Tente reiniciar o equipamento.\n4. Se o problema continuar, abra chamado para o suporte interno.\n\nInclua no chamado: sistema afetado, print do erro e urgência da demanda.'
+      },
+      {
+        palavras: ['documento', 'documentos', 'template', 'modelo', 'arquivo', 'manual'],
+        resposta: 'Os documentos da equipe devem ficar centralizados no repositório oficial da área, como SharePoint, Teams ou pasta corporativa.\n\nProcure por:\n• templates\n• manuais\n• apresentações padrão\n• procedimentos\n• comunicados\n\nCaso não encontre, solicite orientação à liderança.'
+      },
+      {
+        palavras: ['contato', 'quem procurar', 'responsável', 'responsavel', 'liderança', 'lideranca'],
+        resposta: 'Para direcionamento correto:\n\n• Dúvidas de rotina: fale com sua liderança direta.\n• Acessos e equipamentos: suporte interno/Service Desk.\n• Férias, benefícios e dados cadastrais: RH.\n• Dúvidas de projeto: ponto focal do projeto.\n\nPersonalize esta resposta incluindo nomes, e-mails ou canais oficiais da sua equipe.'
+      },
+      {
+        palavras: ['onboarding', 'integração', 'integracao', 'novo colaborador', 'entrada'],
+        resposta: 'Para onboarding de novos profissionais:\n\n1. Validar acessos e equipamentos.\n2. Apresentar canais oficiais da equipe.\n3. Compartilhar documentos e templates.\n4. Explicar rotina de reuniões e apontamentos.\n5. Indicar contatos de apoio.\n\nSugestão: mantenha um checklist de integração atualizado.'
+      },
+      {
+        palavras: ['reunião', 'reuniao', 'agenda', 'ritual', 'daily', 'status'],
+        resposta: 'As reuniões devem seguir a agenda definida pela equipe.\n\nBoas práticas:\n• seja pontual\n• leve atualizações objetivas\n• registre pendências\n• acompanhe prazos e responsáveis\n\nPara alteração de agenda, alinhe previamente com a liderança ou ponto focal.'
+      }
+    ];
 
-Problema: Tela preta ao tentar acessar a VDI
-Causa: Provável problema no sistema operacional Windows.
-Solução:
-1. Faça o login pelo Omnisa Horizon Client ou pelo navegador acessando o endereço https://evdi.bb.com.br/
-2. Clique nos três pontinhos abaixo da sua VDI e clique em "Restart Desktop".
-3. Aguarde por volta de 5 minutos e tente acessar novamente.
+    function normalize(text) {
+      return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
 
-Ao responder sobre esse problema, mencione o link https://evdi.bb.com.br/ de forma clicável.
----`;
+    function addMessage(text, type) {
+      const div = document.createElement('div');
+      div.className = `message ${type}`;
+      div.textContent = text;
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    }
 
-let history = [];
-let isLoading = false;
+    function getBotResponse(question) {
+      const q = normalize(question);
+      const item = respostas.find(r => r.palavras.some(p => q.includes(normalize(p))));
 
-const messagesEl = document.getElementById('messages');
-const inputEl = document.getElementById('msgInput');
-const sendBtn = document.getElementById('sendBtn');
+      if (item) return item.resposta;
 
-function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 140) + 'px';
-}
+      return 'Ainda não encontrei uma resposta específica para essa dúvida.\n\nVocê pode reformular a pergunta ou procurar sua liderança direta para orientação.\n\nSugestão: inclua esta dúvida no FAQ para que o chatbot fique mais completo.';
+    }
 
-function handleKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    if (!isLoading) sendMessage();
-  }
-}
+    function sendMessage(event) {
+      event.preventDefault();
+      const text = userInput.value.trim();
+      if (!text) return;
 
-function removeWelcome() {
-  const w = document.getElementById('welcome');
-  if (w) w.remove();
-}
+      addMessage(text, 'user');
+      userInput.value = '';
 
-function addMessage(role, content, isTyping = false) {
-  const div = document.createElement('div');
-  div.className = `msg ${role}`;
+      setTimeout(() => {
+        addMessage(getBotResponse(text), 'bot');
+      }, 350);
+    }
 
-  const avatar = document.createElement('div');
-  avatar.className = 'avatar';
-  avatar.textContent = role === 'bot' ? '✦' : 'EU';
+    function quickAsk(text) {
+      userInput.value = text;
+      document.querySelector('form').dispatchEvent(new Event('submit'));
+    }
 
-  const bubble = document.createElement('div');
-  bubble.className = 'bubble';
-
-  if (isTyping) {
-    bubble.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
-    div.id = 'typing-indicator';
-  } else {
-    bubble.textContent = content;
-  }
-
-  div.appendChild(avatar);
-  div.appendChild(bubble);
-  messagesEl.appendChild(div);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
-  return { div, bubble };
-}
-
-function showError(msg) {
-  const div = document.createElement('div');
-  div.className = 'error-msg';
-  div.textContent = msg;
-  messagesEl.appendChild(div);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
-  setTimeout(() => div.remove(), 5000);
-}
-
-async function sendMessage() {
-  const text = inputEl.value.trim();
-  if (!text || isLoading) return;
-
-  removeWelcome();
-  inputEl.value = '';
-  inputEl.style.height = 'auto';
-  isLoading = true;
-  sendBtn.disabled = true;
-
-  addMessage('user', text);
-  history.push({ role: 'user', content: text });
-
-  const { div: typingDiv, bubble: typingBubble } = addMessage('bot', '', true);
-
-  try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: SYSTEM_PROMPT,
-        messages: history
-      })
-    });
-
-    if (!response.ok) throw new Error(`Erro ${response.status}`);
-
-    const data = await response.json();
-    const reply = data.content.map(b => b.text || '').join('');
-
-    typingDiv.remove();
-    addMessage('bot', reply);
-    history.push({ role: 'assistant', content: reply });
-
-  } catch (err) {
-    typingDiv.remove();
-    showError('Não foi possível obter uma resposta. Verifique sua conexão e tente novamente.');
-    history.pop();
-    console.error(err);
-  } finally {
-    isLoading = false;
-    sendBtn.disabled = false;
-    inputEl.focus();
-  }
-}
-
-function sendSuggestion(text) {
-  inputEl.value = text;
-  sendMessage();
-}
-
-function clearChat() {
-  history = [];
-  messagesEl.innerHTML = '';
-  const welcome = document.createElement('div');
-  welcome.className = 'welcome';
-  welcome.id = 'welcome';
-  welcome.innerHTML = `
-    <div class="welcome-icon">✦</div>
-    <h2>Olá! Como posso ajudar?</h2>
-    <p>Sou um assistente de IA para dúvidas do dia a dia. Pergunte sobre processos, comunicação, gestão de tempo, ferramentas de trabalho e muito mais.</p>
-    <div class="suggestions">
-      <button class="suggestion" onclick="sendSuggestion('Tela preta ao tentar acessar a VDI — o que faço?')">Tela preta na VDI</button>
-      <button class="suggestion" onclick="sendSuggestion('Como escrever um e-mail profissional de forma clara?')">Como escrever um e-mail profissional?</button>
-      <button class="suggestion" onclick="sendSuggestion('Dicas para organizar melhor minha rotina de trabalho')">Organizar minha rotina</button>
-      <button class="suggestion" onclick="sendSuggestion('Como dar um feedback construtivo para um colega?')">Feedback construtivo</button>
-      <button class="suggestion" onclick="sendSuggestion('Técnicas para conduzir uma reunião eficiente')">Reuniões mais eficientes</button>
-      <button class="suggestion" onclick="sendSuggestion('Como lidar com conflitos na equipe de forma profissional?')">Resolver conflitos na equipe</button>
-      <button class="suggestion" onclick="sendSuggestion('Explique o método Pomodoro para gestão do tempo')">Método Pomodoro</button>
-    </div>
-  `;
-  messagesEl.appendChild(welcome);
-}
-</script>
+    addMessage('Olá! Eu sou o Assistente da Equipe.\n\nPosso ajudar com dúvidas sobre férias, apontamento de horas, reembolso, acessos, documentos, contatos, onboarding e reuniões.\n\nDigite sua dúvida ou escolha uma opção rápida abaixo.', 'bot');
+  </script>
 </body>
 </html>
